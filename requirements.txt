@@ -1,0 +1,8 @@
+streamlit
+requests
+pathlib
+openai        # (for summarization / NLP)
+python-dotenv # (to load API keys)
+google-generativeai # (for Gemini API)
+groq         # (for Groq model access)
+python-docx

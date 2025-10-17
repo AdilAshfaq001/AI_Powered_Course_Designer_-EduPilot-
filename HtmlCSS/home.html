@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPilot - Multi-Model AI Course Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+
+     <link rel="icon" type="image/png" href="i.png">
+
+    <style>
+      
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- Navbar -->
+        <nav>
+            <a href="#" class="logo">
+                <div class="logo-icon"><img src="i.png"></div>
+                <span>EduPilot</span>
+            </a>
+            <div class="nav-links">
+                <!-- <a href="#hero">Home</a> -->
+                <a href="contact.html">Contact</a>
+                <a href="#about">About Us</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section with Grid -->
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>EduPilot: Multi-Model AI-Powered Course Planner</h1>
+                    <p>Transforming the way universities plan and build courses.</p>
+                </div>
+                
+                <div class="hero-grid">
+
+
+                    <!-- Module 1: Learning Objective Setter -->
+
+
+
+                    <div class="module-card">
+                        <h3>
+                            <span class="module-icon">🎯</span>
+                            Learning Objective Setter
+                        </h3>
+                        <p>It collects essential information from the user, such as course topic, target audience, credit hours, prerequisites, and industry skill requirements. Using this input, it applies AI to analyze industry job descriptions, academic standards (like ABET or AACSB), and current market trends. Based on this analysis, it generates clear, measurable learning outcomes that align with both academic and industry expectations.</p>
+                        <a href="https://ai-book-reco.streamlit.app" class="launch-btn">Launch</a>
+                    </div>
+
+                    <!-- Module 2: Curriculum Setter -->
+                    <div class="module-card">
+                        <h3>
+                            <span class="module-icon">📚</span>
+                            Curriculum Setter
+                        </h3>
+                        <p>It considers factors like semester duration, teaching style (theory-based, project-based, or blended), and assessment preferences. Using these inputs, the module breaks the course into weekly modules, allocates time intelligently across lectures, labs, and projects, and creates a learning progression map.</p>
+                        <a href="#" class="launch-btn">Launch</a>
+                    </div>
+
+                    <!-- Module 3: Content Generator -->
+                    <div class="module-card">
+                        <h3>
+                            <span class="module-icon">📝</span>
+                            Content Generator
+                        </h3>
+                        <p>It considers module topics, structure, complexity, resources, and multimedia preferences. Based on this it generates material such as assessment material, quiz and much more.</p>
+                        <a href="#" class="launch-btn">Launch</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about" id="about">
+            <h2>About EduPilot</h2>
+            <p>EduPilot is an innovative AI-powered platform designed to transform the way universities design and develop academic courses. Traditional course development often requires 6–12 months, involves fragmented manual processes, and frequently struggles to align with fast-changing industry trends. EduPilot addresses these challenges by integrating advanced AI models to intelligently generate, structure, and optimize university curricula.</p>
+        </section>
+    </div>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add fade-in animation on scroll for module cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

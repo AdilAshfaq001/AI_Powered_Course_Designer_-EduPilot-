@@ -5,8 +5,18 @@ import io
 from docx import Document
 from modules.module3_content_generator import generate_course_content
 
+def local_css(file_name):
+    try:
+        with open(file_name) as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error(f"CSS file not found: {file_name}. Make sure the 'styles' directory and 'style.css' file exist.")
+
+# --- Apply the custom CSS ---
+local_css("HtmlCSS\streamlit.css")
+
 st.set_page_config(layout="wide")
-st.title("EduPilot — Module 4: Weekly Content Generator")
+st.title("EduPilot — Module 3: Weekly Content Generator")
 
 # --- Input Section in Sidebar ---
 with st.sidebar:

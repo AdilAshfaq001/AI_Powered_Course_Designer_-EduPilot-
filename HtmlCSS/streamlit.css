@@ -1,0 +1,95 @@
+/* Import the 'Inter' font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* --- General Body and Font Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    color: #EAECEE; /* Off-white text */
+    background-color: #0f1419; /* Fallback background */
+}
+
+/* --- Main App Container --- */
+.stApp {
+    background:
+        /* Layer 1: Diagonal lines at 45 degrees */
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 35px,
+            rgba(100, 150, 255, 0.02) 35px,
+            rgba(100, 150, 255, 0.02) 70px
+        ),
+        /* Layer 2: Diagonal lines at -45 degrees to create the crosshatch */
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 35px,
+            rgba(100, 150, 255, 0.02) 35px,
+            rgba(100, 150, 255, 0.02) 70px
+        ),
+        /* Layer 3: The base background gradient */
+        linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
+
+    background-attachment: fixed; /* Ensures the pattern stays in place on scroll */
+}
+
+/* --- Sidebar Styling --- */
+[data-testid="stSidebar"] {
+    background: rgba(26, 31, 46, 0.6); /* Translucent background */
+    border-right: 1px solid rgba(100, 150, 255, 0.2); /* Subtle border */
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+}
+
+/* --- Button Styling --- */
+.stButton>button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff; /* White text for better contrast */
+    border-radius: 8px;
+    border: none; /* Remove border for a cleaner look */
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stButton>button:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Input Widgets Styling --- */
+/* --- UPDATED: Themed border for consistency --- */
+.stTextInput>div>div>input, .stNumberInput>div>div>input {
+    background-color: rgba(45, 45, 45, 0.5);
+    color: #EAECEE;
+    border-radius: 8px;
+    border: 1px solid rgba(100, 150, 255, 0.2);
+}
+
+/* --- Expander Styling --- */
+/* --- UPDATED: Applying the new 'module-card' design --- */
+[data-testid="stExpander"] {
+    background: rgba(26, 31, 46, 0.7);
+    border: 1px solid rgba(100, 150, 255, 0.2);
+    border-radius: 16px !important;
+    backdrop-filter: blur(5px);
+    margin-bottom: 1rem;
+}
+
+[data-testid="stExpander"] p { /* Expander header text */
+    color: #EAECEE;
+    font-weight: 600;
+}
+
+
+/* --- Success/Info/Error Boxes --- */
+.stAlert {
+    border-radius: 8px;
+}
+
+/* --- Title Font --- */
+h1 {
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
+}
+

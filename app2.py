@@ -5,6 +5,16 @@ import re
 import io
 from docx import Document
 
+def local_css(file_name):
+    try:
+        with open(file_name) as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error(f"CSS file not found: {file_name}. Make sure the 'styles' directory and 'style.css' file exist.")
+
+# --- Apply the custom CSS ---
+local_css("HtmlCSS\streamlit.css")
+
 st.set_page_config(layout="wide")
 st.title("EduPilot — Module 2: Curriculum Structurer")
 

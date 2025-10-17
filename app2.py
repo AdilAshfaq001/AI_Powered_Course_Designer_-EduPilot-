@@ -2,74 +2,89 @@ import streamlit as st
 from modules.module2_curriculum_structurer import generate_curriculum
 import os
 import re
-from docx import Document  # dependency for .docx download
+import io
+from docx import Document
 
-st.title("EduDesign AI — Module 2: Curriculum Structurer")
+st.set_page_config(layout="wide")
+st.title("EduPilot — Module 2: Curriculum Structurer")
 
-with st.form("curriculum_form"):
-    uploaded_file = st.file_uploader("Upload Module 1 JSON file (optional)", type=["json"])
-    learning_outcomes_input = st.text_area("Or paste Learning Outcomes here")
-
+# --- Input Section in Sidebar ---
+with st.sidebar:
+    st.header("⚙️ Curriculum Parameters")
+    uploaded_file = st.file_uploader("Upload Module 1 JSON file", type=["json"])
+    learning_outcomes_input = st.text_area("Or paste Learning Outcomes here", height=150)
     time_weeks = st.slider("Course Duration (weeks)", 8, 20, 15)
     approach = st.selectbox("Pedagogical Approach", ["Project-based", "Theory", "Blended"])
-    assessments = st.multiselect("Assessment Preferences", ["Quizzes", "Projects", "Exams", "Presentations", "Labs"])
+    assessments = st.multiselect("Assessment Preferences", ["Quizzes", "Projects", "Exams", "Presentations", "Labs"], default=["Quizzes", "Projects", "Exams"])
+    submitted = st.button("Generate Curriculum")
 
-    submitted = st.form_submit_button("Generate Curriculum")
-
+# --- Output Section in Main Area ---
 if submitted:
-    if uploaded_file:
-        temp_path = os.path.join(r"D:\AI_MID_Project_Data\api_downloads", uploaded_file.name)
-        with open(temp_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        learning_input = temp_path
+    if not uploaded_file and not learning_outcomes_input:
+        st.error("Please upload a file or paste learning outcomes to proceed.")
     else:
-        learning_input = learning_outcomes_input
+        if uploaded_file:
+            temp_dir = "temp_uploads"
+            os.makedirs(temp_dir, exist_ok=True)
+            temp_path = os.path.join(temp_dir, uploaded_file.name)
+            with open(temp_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            learning_input = temp_path
+        else:
+            learning_input = learning_outcomes_input
 
-    with st.spinner("Generating curriculum..."):
-        curriculum_text, _ = generate_curriculum(learning_input, time_weeks, approach, assessments)
-        st.success("Curriculum Generated!")
+        with st.spinner("Generating curriculum..."):
+            curriculum_text, _ = generate_curriculum(learning_input, time_weeks, approach, assessments)
+            
+            if curriculum_text:
+                st.success("✅ Curriculum Generated Successfully!")
+                st.subheader("📄 Generated Curriculum Plan")
 
-        # === Present curriculum in expanders ===
-        modules = re.split(r"(?=\*\*Module \d+)", curriculum_text)  # split but keep header
-        for mod in modules:
-            if mod.strip():
-                header_match = re.match(r"\*\*(Module \d+.*?)\*\*", mod)
-                header = header_match.group(1) if header_match else "Module"
-                body = mod.replace(f"**{header}**", "").strip()
-                with st.expander(header):
-                    st.markdown(body, unsafe_allow_html=True)
+                modules = re.split(r"(?=\*\*Module \d+)", curriculum_text)
+                for mod in modules:
+                    if mod.strip():
+                        header_match = re.match(r"\*\*(Module \d+.*?)\*\*", mod)
+                        header = header_match.group(1) if header_match else "Module"
+                        body = mod.replace(f"**{header}**", "").strip()
+                        with st.expander(header):
+                            st.markdown(body, unsafe_allow_html=True)
 
-        # Full text fallback
-        with st.expander("Full Curriculum Text"):
-            st.text_area("Curriculum Plan", curriculum_text, height=400)
+                # --- Download Buttons ---
+                st.subheader("⬇️ Download Options")
+                col1, col2 = st.columns(2)
 
-        # === TXT download ===
-        download_path_txt = os.path.join(r"D:\AI_MID_Project_Data\api_downloads", "Curriculum_Plan.txt")
-        with open(download_path_txt, "w", encoding="utf-8") as f:
-            f.write(curriculum_text)
-
-        st.download_button(
-            label="📥 Download Curriculum Plan (TXT)",
-            data=curriculum_text,
-            file_name="Curriculum_Plan.txt",
-            mime="text/plain"
-        )
-
-        # === DOCX download with module headers bold ===
-        download_path_docx = os.path.join(r"D:\AI_MID_Project_Data\api_downloads", "Curriculum_Plan.docx")
-        doc = Document()
-        for mod in modules:
-            if mod.strip():
-                header_match = re.match(r"\*\*(Module \d+.*?)\*\*", mod)
-                header = header_match.group(1) if header_match else "Module"
-                body = mod.replace(f"**{header}**", "").strip()
-                doc.add_paragraph(header, style='Heading2')
-                doc.add_paragraph(body)
-        doc.save(download_path_docx)
-
-        st.download_button(
-            label="📥 Download Curriculum Plan (DOCX)",
-            data=open(download_path_docx, "rb").read(),
-            file_name="Curriculum_Plan.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+                with col1:
+                    st.download_button(
+                        label="📥 Download as TXT",
+                        data=curriculum_text,
+                        file_name="Curriculum_Plan.txt",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+                
+                with col2:
+                    doc = Document()
+                    doc.add_heading("Curriculum Plan", level=1)
+                    for mod in modules:
+                        if mod.strip():
+                            header_match = re.match(r"\*\*(Module \d+.*?)\*\*", mod)
+                            header = header_match.group(1) if header_match else "Module"
+                            body = mod.replace(f"**{header}**", "").strip()
+                            doc.add_paragraph(header, style='Heading2')
+                            doc.add_paragraph(body)
+                    
+                    bio = io.BytesIO()
+                    doc.save(bio)
+                    bio.seek(0)
+                    
+                    st.download_button(
+                        label="📥 Download as DOCX",
+                        data=bio.getvalue(),
+                        file_name="Curriculum_Plan.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True
+                    )
+            else:
+                st.error("⚠️ Failed to generate curriculum.")
+else:
+    st.info("Provide the learning outcomes and course parameters in the sidebar, then click 'Generate Curriculum'.")

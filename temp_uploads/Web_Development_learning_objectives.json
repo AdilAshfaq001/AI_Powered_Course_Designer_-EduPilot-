@@ -1,0 +1,10 @@
+{
+    "topic": "Web Development",
+    "objectives": [
+        "1. Apply fundamental HTML and CSS principles to construct well-structured, styled, and static web pages from a design specification.",
+        "2. Implement client-side interactivity and dynamic content by manipulating the Document Object Model (DOM) using core JavaScript concepts and event handling.",
+        "3. Adapt web page layouts for various screen sizes, including mobile, tablet, and desktop, by implementing responsive design techniques such as media queries and flexible grids.",
+        "4. Utilize JavaScript to asynchronously retrieve and display data from third-party Application Programming Interfaces (APIs) within a web application.",
+        "5. Develop a complete, multi-page portfolio website that integrates HTML, CSS, and JavaScript, managing the project source code with Git and deploying the final product to a public web server."
+    ]
+}

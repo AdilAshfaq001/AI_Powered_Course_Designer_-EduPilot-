@@ -1,75 +1,116 @@
 import streamlit as st
 import asyncio
 import os
+import io
+from docx import Document
 from modules.module3_content_generator import generate_course_content
 
 st.set_page_config(layout="wide")
-st.title("EduDesign AI — Module 3: Content Generator")
+st.title("EduPilot — Module 4: Weekly Content Generator")
 
-st.info(
-    "This module uses the curriculum from Module 2 to generate detailed course content "
-    "for a specific module."
-)
-
-with st.form("content_generation_form"):
+# --- Input Section in Sidebar ---
+with st.sidebar:
+    st.header("⚙️ Content Parameters")
     uploaded_file = st.file_uploader("Upload Module 2 JSON file", type=["json"])
 
-    # --- NEW: Add a dropdown to select the module number ---
-    module_number = st.selectbox(
-        "Select Module to Generate Content For",
-        options=[1, 2, 3, 4],
-        index=0  # Default to Module 1
+    week_number = st.slider(
+        "Select Week to Generate Content For",
+        min_value=1,
+        max_value=15,
+        value=1,
+        step=1
     )
 
-    complexity = st.select_slider(
+    complexity = st.selectbox(
         "Select Learning Complexity",
         options=["Beginner", "Intermediate", "Advanced", "Expert"],
-        value="Intermediate"
+        index=1
     )
 
     multimedia_prefs = st.multiselect(
-        "Multimedia Preferences",
-        ["Text", "Images", "Videos", "Interactive simulations"],
-        default=["Text", "Images"]
+        "Select Multimedia/Resource Preferences",
+        ['Text', 'Books', 'Articles', 'Websites', 'Official Documentation', 'YouTube Links'],
+        default=['Text', 'Books', 'Articles', 'YouTube Links']
     )
 
-    submitted = st.form_submit_button("Generate Course Content")
+    submitted = st.button("Generate Weekly Content")
 
-if submitted and uploaded_file:
-    temp_dir = os.path.join(r"D:\AI_MID_Project_Data\api_downloads", "temp")
-    os.makedirs(temp_dir, exist_ok=True)
-    temp_path = os.path.join(temp_dir, uploaded_file.name)
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
 
-    with st.spinner(f"🚀 Generating content for Module {module_number}..."):
-        # --- Pass the selected module_number to the function ---
-        content, filepath = asyncio.run(generate_course_content(
-            temp_path, module_number, complexity, multimedia_prefs
-        ))
-        st.success(f"✅ Content generation for Module {module_number} complete!")
+# --- Output Section in Main Area ---
+if submitted:
+    if uploaded_file:
+        temp_dir = "temp_uploads"
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_path = os.path.join(temp_dir, uploaded_file.name)
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
 
-        st.subheader(f"Generated Content for Module {module_number}")
+        with st.spinner(f"🚀 Generating content for Week {week_number}..."):
+            content, filepath = asyncio.run(generate_course_content(
+                temp_path, week_number, complexity, multimedia_prefs
+            ))
+            
+            if content:
+                st.success(f"✅ Content generation for Week {week_number} complete!")
+                st.subheader(f"Generated Content for Week {week_number}")
 
-        with st.expander("📝 Lecture Notes"):
-            st.markdown(content.get("lecture_notes", "Not available."))
+                # Display content in expanders
+                with st.expander("📝 Lecture Notes"):
+                    st.markdown(content.get("lecture_notes", "Not available."))
 
-        with st.expander("📚 Reading Materials & References"):
-            st.markdown(content.get("reading_materials", "Not available."))
+                with st.expander("📚 Reading Materials & References"):
+                    st.markdown(content.get("reading_materials", "Not available."))
 
-        with st.expander("💻 Exercises & Projects"):
-            st.markdown(content.get("exercises_projects", "Not available."))
+                with st.expander("💻 Exercises & Projects"):
+                    st.markdown(content.get("exercises_projects", "Not available."))
 
-        with st.expander("❓ Assessment Questions"):
-            st.markdown(content.get("assessment_questions", "Not available."))
+                with st.expander("❓ Assessment Questions"):
+                    st.markdown(content.get("assessment_questions", "Not available."))
 
-        with open(filepath, "r", encoding="utf-8") as f:
-            st.download_button(
-                label=f"📥 Download Content for Module {module_number} (JSON)",
-                data=f.read(),
-                file_name=os.path.basename(filepath),
-                mime="application/json"
-            )
+                # --- Download Buttons ---
+                st.subheader("⬇️ Download Options")
+                col1, col2 = st.columns(2)
 
-elif submitted and not uploaded_file:
-    st.error("Please upload the JSON file from Module 2.")
+                # JSON download
+                with col1:
+                    with open(filepath, "r", encoding="utf-8") as f:
+                        st.download_button(
+                            label=f"📥 Download as JSON",
+                            data=f.read(),
+                            file_name=os.path.basename(filepath),
+                            mime="application/json",
+                            use_container_width=True
+                        )
+
+                # DOCX download
+                with col2:
+                    doc = Document()
+                    doc.add_heading(f'Course Content: Week {week_number}', level=1)
+                    doc.add_heading('Lecture Notes', level=2)
+                    doc.add_paragraph(content.get("lecture_notes", "Not available."))
+                    doc.add_heading('Reading Materials & References', level=2)
+                    doc.add_paragraph(content.get("reading_materials", "Not available."))
+                    doc.add_heading('Exercises & Projects', level=2)
+                    doc.add_paragraph(content.get("exercises_projects", "Not available."))
+                    doc.add_heading('Assessment Questions', level=2)
+                    doc.add_paragraph(content.get("assessment_questions", "Not available."))
+
+                    bio = io.BytesIO()
+                    doc.save(bio)
+                    bio.seek(0)
+                    
+                    st.download_button(
+                        label="📥 Download as DOCX",
+                        data=bio.getvalue(),
+                        file_name=f"Week_{week_number}_Content.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True
+                    )
+            else:
+                st.error(f"⚠️  Failed to generate content for Week {week_number}.")
+
+    else:
+        st.error("Please upload the JSON file from Module 2.")
+else:
+    st.info("Upload the curriculum file and set the parameters in the sidebar, then click 'Generate Weekly Content'.")
+
